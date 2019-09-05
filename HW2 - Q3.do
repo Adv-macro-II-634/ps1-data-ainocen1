@@ -4,7 +4,6 @@ use "C:\Users\ancil\Dropbox\BINGHAMTON PHD\FALL 2019\ECON 634 - Advanced Macroec
 set more off
 
 /* 
-
 I. KEY VARIABLE DEFINITIONS
 	A. Income - all kinds of revenue before taxes
 		= govt and private transfers + wages + salaries + ...
@@ -38,15 +37,26 @@ II. MEASUREMENT DEFINITIONS
 
 	G. mean / median
 
-
 */
 
 
 // Defining other key variables
 
+//total income variable
+gen income=X5729
+
+//total asset variable
+gen asset =X6432 
+
+//total debt variable
+gen debt = X6439
+
 gen wealth = asset - debt
 
 gen earnings = wageinc + bussefarminc
 
+//dropping other variables
+
+keep income wealth earnings
 
 // getting quantiles
