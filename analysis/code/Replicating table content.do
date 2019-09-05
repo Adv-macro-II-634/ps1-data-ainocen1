@@ -1,21 +1,22 @@
-//For Table 1
+**After running processing do file:
 
-// generating quantiles
+**For Table 1
+
+** generating quantiles
 sum income, detail
 sum earnings, detail
 sum wealth, detail
 
-xtile ptile_inc= income,nq(100)
-xtile dec_inc= income,nq(20)
+xtile ptile_income= income,nq(100)
+tab ptile_inc, sum(income)
 
 xtile ptile_wealth= wealth,nq(100)
-xtile dec_wealth= wealth,nq(20)
+tab ptile_wealth, sum(wealth)
 
 xtile ptile_earnings= earnings,nq(100)
-xtile dec_earnings= earnings,nq(20)
+tab ptile_earnings, sum(earnings)
 
-
-//For Table 2
+**For Table 2
 
 /*
 II. MEASUREMENT DEFINITIONS
@@ -38,7 +39,7 @@ II. MEASUREMENT DEFINITIONS
 
 */
 
-//For Coefficient of variation
+**For Coefficient of variation
 
 sum income
 di r(sd)/r(mean)
@@ -50,33 +51,58 @@ sum earnings
 di r(sd)/r(mean)
 
 
-//For Variance of logs
-gen ln_inc=log(income)
-gen ln_wlth=log(wealth)
-gen ln_earn=log(earnings)
+**For Variance of logs
+foreach x of varlist earnings income wealth {
+	gen ln_`x' = log(`x')
+	egen sd_`x'= sd(ln_`x')
+	gen var_`x' =sd_`x'^2
+} 
 
-egen sd_inc=sd(ln_inc)
-egen sd_wlth=sd(ln_wlth)
-egen sd_earn=sd(ln_earn)
+**Top 1% / lowest 40%
 
-gen var_inc=sd_inc^2
-gen var_wlth=sd_wlth^2
-gen var_earn=sd_earn^2
+foreach x of varlist earnings income wealth {
+	egen top_`x'=sum(`x') if ptile_`x'==99
+	egen low_`x'=sum(`x') if ptile_`x'==40
+}
 
-//Top 1% / lowest 40%
+**earning
+di 318000000/10300000
 
+**income
+di 3250000000/8976000
 
+**wealth
+di 0/0
 
+**Mean location
+sum income
+count if income<840088
+di 100*(27337/30075)
 
-//For Gini
-*ssc install ineqdeco
+sum wealth
+count if wealth<650
+di 100*(29873/30075)
+
+sum earnings
+count if earnings<120864
+di 100*(24987/30075)
+
+**For Gini
+ssc install ineqdeco
 
 ineqdeco income
 ineqdeco wealth
 ineqdeco earnings
 
 
-//For Lorenz Curve
-*ssc install glcurve
-glcurve income
+**For Lorenz Curve
+ssc install lorenz
+lorenz income
+lorenz graph
+
+lorenz wealth
+lorenz graph
+
+lorenz earnings
+lorenz graph
  
